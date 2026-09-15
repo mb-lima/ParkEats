@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkEats</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── topbar ── -->
+<div class="topbar">
+  <div class="topbar-left" id="logoArea" style="cursor:pointer;">
+    <div class="mark">P</div>
+    <span class="mark-name">ParkEats</span>
+  </div>
+  <button class="back-btn" id="backBtn">← Voltar</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     HOME VIEW
+══════════════════════════════════════ -->
+<div class="view active" id="viewHome">
+  <div class="home-hero">
+    <h1>Antes da mesa, descubra o estacionamento.</h1>
+    <p class="lede">Saiba como foi estacionar num restaurante antes de sair de casa.</p>
+    <div class="home-actions">
+      <button class="home-btn primary" id="btnSearch">
+        <span class="hb-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </span>
+        <div>
+          <div class="hb-title">Buscar um restaurante</div>
+          <div class="hb-sub">Ver avaliações de estacionamento</div>
+        </div>
+      </button>
+      <button class="home-btn secondary" id="btnReview">
+        <span class="hb-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+          </svg>
+        </span>
+        <div>
+          <div class="hb-title">Avaliar um lugar</div>
+          <div class="hb-sub">Conte como foi estacionar</div>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SEARCH VIEW
+══════════════════════════════════════ -->
+<div class="view" id="viewSearch">
+  <div class="wrap" style="padding-top:32px;padding-bottom:80px;">
+    <h2>Qual restaurante?</h2>
+    <p class="sub" style="margin-bottom:22px;color:var(--ink-dim);font-size:14.5px;">Busque pelo nome e veja como foi estacionar.</p>
+
+    <div class="search-bar-wrap" id="searchBarWrap">
+      <div id="searchAutoWrap" style="flex:1;min-width:0;width:100%;"></div>
+    </div>
+
+    <div class="results-area" id="resultsArea"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     REVIEW VIEW
+══════════════════════════════════════ -->
+<div class="view" id="viewReview">
+  <div class="review-view">
+    <div class="wrap">
+      <h2>Como foi estacionar lá?</h2>
+      <p class="sub">Sem cadastro, sem enrolação.</p>
+
+      <form class="review-form" id="reviewForm">
+
+        <!-- Restaurante -->
+        <div class="field">
+          <label>Restaurante</label>
+          <div class="prefilled-place" id="prefilledPlace" style="display:none;">
+            <div>
+              <strong id="prefilledName"></strong>
+              <span class="pp-addr" id="prefilledAddr"></span>
+            </div>
+            <button type="button" id="clearPrefilledBtn">trocar</button>
+          </div>
+          <div class="search-field-rv" id="searchFieldWrap" style="display:block;"></div>
+          <div class="selected-place" id="selectedPlaceBox" style="display:none;">
+            <div>
+              <strong id="selectedPlaceName"></strong>
+              <span class="sp-addr" id="selectedPlaceAddr"></span>
+            </div>
+            <button type="button" id="changePlaceBtn">trocar</button>
+          </div>
+        </div>
+
+        <!-- Como você estacionou? -->
+        <div class="field">
+          <label>Como você estacionou?</label>
+          <div class="parking-cards" id="parkingCards">
+            <button type="button" class="park-card" data-v="local">
+              <span class="pc-icon">🅿️</span>
+              <div class="pc-name">No local</div>
+              <div class="pc-sub">Estacionamento próprio do restaurante</div>
+            </button>
+            <button type="button" class="park-card" data-v="proximo">
+              <span class="pc-icon">🏢</span>
+              <div class="pc-name">Próximo</div>
+              <div class="pc-sub">Particular ou shopping</div>
+            </button>
+            <button type="button" class="park-card" data-v="rua">
+              <span class="pc-icon">🛣️</span>
+              <div class="pc-name">Na rua</div>
+              <div class="pc-sub">Vaga em via pública</div>
+            </button>
+          </div>
+          <div class="dist-field" id="distField">
+            <label>Distância até o restaurante</label>
+            <input type="text" id="rDist" placeholder="Ex: 3 min a pé, 200 m...">
+          </div>
+        </div>
+
+        <!-- Nota -->
+        <div class="field">
+          <label>Como foi? <span style="color:var(--curb-red);font-weight:700">*</span></label>
+          <div class="star-row">
+            <div class="star-rating" id="starRating">
+              <input type="radio" name="nota" id="star5" value="5"><label for="star5">★</label>
+              <input type="radio" name="nota" id="star4" value="4"><label for="star4">★</label>
+              <input type="radio" name="nota" id="star3" value="3"><label for="star3">★</label>
+              <input type="radio" name="nota" id="star2" value="2"><label for="star2">★</label>
+              <input type="radio" name="nota" id="star1" value="1"><label for="star1">★</label>
+            </div>
+            <span class="star-word" id="starWord"></span>
+          </div>
+        </div>
+
+        <!-- Dynamic chips -->
+        <div class="chips-section field" id="chipsSection">
+          <label>O que influenciou sua avaliação? <span class="chips-limit-note">Escolha até 3</span></label>
+          <div class="chip-group" id="dynamicChips"></div>
+        </div>
+
+        <!-- Horário -->
+        <div class="field">
+          <label>Horário que foi (opcional)</label>
+          <div class="period-chips" id="periodChips">
+            <button type="button" class="chip" data-v="manha">Manhã</button>
+            <button type="button" class="chip" data-v="almoco">Almoço</button>
+            <button type="button" class="chip" data-v="tarde">Tarde</button>
+            <button type="button" class="chip" data-v="noite">Noite</button>
+            <button type="button" class="chip" data-v="madrugada">Madrugada</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Seu primeiro nome (opcional)</label>
+          <input type="text" id="rAuthor" placeholder="Como quer aparecer">
+        </div>
+
+        <div class="field">
+          <label>Comentário (opcional)</label>
+          <textarea id="rComment" placeholder="Ex: fui sexta às 20h, achei vaga em 5 minutos..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="reviewBtn">Enviar avaliação</button>
+      </form>
+      <div class="status-msg" id="reviewStatus"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqBnwnCfHHawSto09G0tmPkBesF1RkWKo&libraries=places&loading=async&callback=initAutocomplete" async defer></script>
+</body>
+</html>
