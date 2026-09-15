@@ -300,6 +300,9 @@ function esc(str) {
 async function showResults(name, address) {
   const area = document.getElementById('resultsArea');
   area.innerHTML = '<div style="color:var(--ink-dim);font-size:14px;padding:32px 0;text-align:center;">Buscando avaliações...</div>';
+
+  // Scroll to top so the search field stays visible on mobile
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   try {
     const r    = await sbFetch(`avaliacoes?restaurante=ilike.*${encodeURIComponent(name)}*&order=created_at.desc`);
     const rows = await r.json();
@@ -334,13 +337,15 @@ function buildResultCard(name, address, rows) {
   const total    = rows.length;
   const avgScore = rows.reduce((s, r) => s + (r.nota_geral || 0), 0) / total;
 
-  const typeCounts = { local: 0, proximo: 0, rua: 0 };
-  const typeRec    = { local: 0, proximo: 0, rua: 0 };
+  // Pontuação ponderada: nota 5=100%, 4=75%, 3=50%, 2=25%, 1=0%
+  const NOTE_WEIGHT = { 5: 1.0, 4: 0.75, 3: 0.5, 2: 0.25, 1: 0 };
+  const typeCounts  = { local: 0, proximo: 0, rua: 0 };
+  const typeScore   = { local: 0, proximo: 0, rua: 0 };
   rows.forEach(r => {
     const t = r.tipo_estacionamento;
     if (t && typeCounts[t] !== undefined) {
       typeCounts[t]++;
-      if (r.nota_geral >= 4) typeRec[t]++;
+      typeScore[t] += NOTE_WEIGHT[r.nota_geral] ?? 0;
     }
   });
 
@@ -366,7 +371,7 @@ function buildResultCard(name, address, rows) {
     ['rua',     '🛣️', 'Na rua',                  'Vaga em via pública'],
   ].forEach(([k, icon, label, sub]) => {
     if (typeCounts[k] === 0) return;
-    const pct = Math.round((typeRec[k] / typeCounts[k]) * 100);
+    const pct = Math.round((typeScore[k] / typeCounts[k]) * 100);
     typesHtml += `<div class="pr-type-row">
       <span class="pr-type-icon">${icon}</span>
       <div class="pr-type-body">
