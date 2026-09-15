@@ -125,21 +125,31 @@ button, input, textarea { font: inherit; color: inherit; }
 /* ══════════════════════════════════════
    SEARCH VIEW
 ══════════════════════════════════════ */
-.search-view { padding: 32px 0 80px; }
-.search-view h2 {
+
+.search-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--asphalt);
+  padding: 24px 0 16px;
+  /* shadow to visually separate from results when scrolling */
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.search-sticky h2 {
   font-size: clamp(22px, 4vw, 30px);
   font-weight: 800;
   letter-spacing: -0.01em;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
-.search-view .sub { color: var(--ink-dim); font-size: 14.5px; margin-bottom: 24px; }
+.search-sticky .sub { color: var(--ink-dim); font-size: 14.5px; margin-bottom: 16px; }
 
 .search-bar-wrap {
   max-width: 560px;
   color-scheme: dark;
 }
 
-.results-area { margin-top: 32px; max-width: 560px; }
+.search-results-wrap { padding-bottom: 80px; }
+.results-area { margin-top: 24px; max-width: 560px; }
 
 /* place result card */
 .place-result {

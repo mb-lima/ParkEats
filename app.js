@@ -300,9 +300,6 @@ function esc(str) {
 async function showResults(name, address) {
   const area = document.getElementById('resultsArea');
   area.innerHTML = '<div style="color:var(--ink-dim);font-size:14px;padding:32px 0;text-align:center;">Buscando avaliações...</div>';
-
-  // Scroll to top so the search field stays visible on mobile
-  window.scrollTo({ top: 0, behavior: 'smooth' });
   try {
     const r    = await sbFetch(`avaliacoes?restaurante=ilike.*${encodeURIComponent(name)}*&order=created_at.desc`);
     const rows = await r.json();

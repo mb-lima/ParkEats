@@ -55,14 +55,16 @@
      SEARCH VIEW
 ══════════════════════════════════════ -->
 <div class="view" id="viewSearch">
-  <div class="wrap" style="padding-top:32px;padding-bottom:80px;">
-    <h2>Qual restaurante?</h2>
-    <p class="sub" style="margin-bottom:22px;color:var(--ink-dim);font-size:14.5px;">Busque pelo nome e veja como foi estacionar.</p>
-
-    <div class="search-bar-wrap" id="searchBarWrap">
-      <div id="searchAutoWrap" style="flex:1;min-width:0;width:100%;"></div>
+  <div class="search-sticky" id="searchSticky">
+    <div class="wrap">
+      <h2>Qual restaurante?</h2>
+      <p class="sub">Busque pelo nome e veja como foi estacionar.</p>
+      <div class="search-bar-wrap" id="searchBarWrap">
+        <div id="searchAutoWrap" style="width:100%;"></div>
+      </div>
     </div>
-
+  </div>
+  <div class="wrap search-results-wrap">
     <div class="results-area" id="resultsArea"></div>
   </div>
 </div>
