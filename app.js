@@ -189,6 +189,7 @@ document.getElementById('periodChips').addEventListener('click', e => {
 });
 
 // ── review: place search ──────────────────────────────────────────────────────
+let reviewAutoEl = null;
 
 function setupReviewPlace(prefilled) {
   const preBox = document.getElementById('prefilledPlace');
@@ -206,8 +207,7 @@ function setupReviewPlace(prefilled) {
     preBox.style.display = 'none';
     sfWrap.style.display = 'block';
     selBox.style.display = 'none';
-    const inp = document.getElementById('reviewSearchInput');
-    if (inp) inp.value = '';
+    if (reviewAutoEl && reviewAutoEl.value !== undefined) reviewAutoEl.value = '';
   }
 }
 
@@ -216,8 +216,7 @@ document.getElementById('changePlaceBtn').addEventListener('click', () => {
   selectedPlaceRv = null;
   document.getElementById('selectedPlaceBox').style.display = 'none';
   document.getElementById('searchFieldWrap').style.display = 'block';
-  const inp = document.getElementById('reviewSearchInput');
-  if (inp) inp.value = '';
+  if (reviewAutoEl && reviewAutoEl.value !== undefined) reviewAutoEl.value = '';
 });
 
 function selectPlaceRv(name, address) {
@@ -288,7 +287,8 @@ document.getElementById('reviewForm').addEventListener('submit', async e => {
 });
 
 // ── search results ────────────────────────────────────────────────────────────
-let searchedPlace = null;
+let searchedPlace      = null;
+let searchAutoEl       = null;
 
 function esc(str) {
   const d = document.createElement('div');
@@ -420,32 +420,63 @@ function buildResultCard(name, address, rows) {
 }
 
 // ── Google Places init ────────────────────────────────────────────────────────
-function initAutocomplete() {
-  const options = { fields: ['name', 'formatted_address'] };
+async function initAutocomplete() {
+  const { PlaceAutocompleteElement } = await google.maps.importLibrary('places');
+
+  // Patch the inner input of a PlaceAutocompleteElement so iOS/Android don't
+  // trigger their fullscreen search UI. We wait for the shadow DOM to render,
+  // then set enterkeyhint and a fixed position on focus to prevent the page
+  // from scrolling the element off-screen when the keyboard opens.
+  function patchMobileInput(el) {
+    const tryPatch = () => {
+      const input = el.shadowRoot && el.shadowRoot.querySelector('input');
+      if (!input) return false;
+      input.setAttribute('enterkeyhint', 'search');
+      // On focus: scroll to top so the sticky header stays visible
+      input.addEventListener('focus', () => {
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'instant' }), 100);
+      });
+      return true;
+    };
+    if (!tryPatch()) {
+      const t = setInterval(() => { if (tryPatch()) clearInterval(t); }, 50);
+    }
+  }
 
   // Search view
-  const searchInput = document.getElementById('searchInput');
-  const acSearch = new google.maps.places.Autocomplete(searchInput, options);
-  acSearch.addListener('place_changed', () => {
-    const place = acSearch.getPlace();
-    if (!place.name) return;
-    searchedPlace = { name: place.name, address: place.formatted_address || '' };
+  searchAutoEl = new PlaceAutocompleteElement();
+  searchAutoEl.style.width = '100%';
+  searchAutoEl.style.colorScheme = 'dark';
+  document.getElementById('searchAutoWrap').appendChild(searchAutoEl);
+  patchMobileInput(searchAutoEl);
+
+  searchAutoEl.addEventListener('gmp-select', async event => {
+    const place = event.placePrediction.toPlace();
+    await place.fetchFields({ fields: ['displayName', 'formattedAddress'] });
+    searchedPlace = { name: place.displayName, address: place.formattedAddress || '' };
     showResults(searchedPlace.name, searchedPlace.address);
   });
-  // Clear results when input is manually cleared
-  searchInput.addEventListener('input', () => {
-    if (searchedPlace && searchInput.value.trim() === '') {
+
+  // Poll to detect when user clears the input
+  setInterval(() => {
+    const inner = searchAutoEl.shadowRoot && searchAutoEl.shadowRoot.querySelector('input');
+    const val = inner ? inner.value : (searchAutoEl.value || '');
+    if (searchedPlace && val.trim() === '') {
       searchedPlace = null;
       document.getElementById('resultsArea').innerHTML = '';
     }
-  });
+  }, 300);
 
   // Review view
-  const reviewInput = document.getElementById('reviewSearchInput');
-  const acReview = new google.maps.places.Autocomplete(reviewInput, options);
-  acReview.addListener('place_changed', () => {
-    const place = acReview.getPlace();
-    if (!place.name) return;
-    selectPlaceRv(place.name, place.formatted_address || '');
+  reviewAutoEl = new PlaceAutocompleteElement();
+  reviewAutoEl.style.width = '100%';
+  reviewAutoEl.style.colorScheme = 'light';
+  document.getElementById('reviewAutoWrap').appendChild(reviewAutoEl);
+  patchMobileInput(reviewAutoEl);
+
+  reviewAutoEl.addEventListener('gmp-select', async event => {
+    const place = event.placePrediction.toPlace();
+    await place.fetchFields({ fields: ['displayName', 'formattedAddress'] });
+    selectPlaceRv(place.displayName, place.formattedAddress || '');
   });
 }

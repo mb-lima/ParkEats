@@ -132,8 +132,6 @@ button, input, textarea { font: inherit; color: inherit; }
   z-index: 10;
   background: var(--asphalt);
   padding: 24px 0 16px;
-  /* shadow to visually separate from results when scrolling */
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
 .search-sticky h2 {
   font-size: clamp(22px, 4vw, 30px);
@@ -147,33 +145,6 @@ button, input, textarea { font: inherit; color: inherit; }
   max-width: 560px;
   color-scheme: dark;
 }
-
-/* native input styling for both autocomplete fields */
-.search-input {
-  width: 100%;
-  background: #2a3330;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 11px 14px;
-  font-size: 15px;
-  color: var(--ink);
-  outline: none;
-}
-.search-input::placeholder { color: var(--ink-dim); }
-.search-input:focus { border-color: var(--curb-yellow); }
-
-.review-search-input {
-  width: 100%;
-  background: #fff;
-  border: 1px solid #d9d4c4;
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 14.5px;
-  color: var(--paper-ink);
-  outline: none;
-}
-.review-search-input::placeholder { color: #8a8f80; }
-.review-search-input:focus { border-color: var(--paper-ink); }
 
 /* Google Places dropdown overrides */
 .pac-container {
