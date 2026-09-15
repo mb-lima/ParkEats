@@ -60,7 +60,7 @@
       <h2>Qual restaurante?</h2>
       <p class="sub">Busque pelo nome e veja como foi estacionar.</p>
       <div class="search-bar-wrap" id="searchBarWrap">
-        <div id="searchAutoWrap" style="width:100%;"></div>
+        <input type="text" id="searchInput" class="search-input" placeholder="Nome do restaurante..." autocomplete="off">
       </div>
     </div>
   </div>
@@ -90,7 +90,9 @@
             </div>
             <button type="button" id="clearPrefilledBtn">trocar</button>
           </div>
-          <div class="search-field-rv" id="searchFieldWrap" style="display:block;"></div>
+          <div class="search-field-rv" id="searchFieldWrap" style="display:block;">
+            <input type="text" id="reviewSearchInput" class="review-search-input" placeholder="Nome do restaurante..." autocomplete="off">
+          </div>
           <div class="selected-place" id="selectedPlaceBox" style="display:none;">
             <div>
               <strong id="selectedPlaceName"></strong>
@@ -177,6 +179,6 @@
 </div>
 
 <script src="app.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqBnwnCfHHawSto09G0tmPkBesF1RkWKo&libraries=places&loading=async&callback=initAutocomplete" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqBnwnCfHHawSto09G0tmPkBesF1RkWKo&libraries=places&callback=initAutocomplete" async defer></script>
 </body>
 </html>

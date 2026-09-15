@@ -189,7 +189,6 @@ document.getElementById('periodChips').addEventListener('click', e => {
 });
 
 // ── review: place search ──────────────────────────────────────────────────────
-let placeAutocompleteRv = null;
 
 function setupReviewPlace(prefilled) {
   const preBox = document.getElementById('prefilledPlace');
@@ -207,7 +206,8 @@ function setupReviewPlace(prefilled) {
     preBox.style.display = 'none';
     sfWrap.style.display = 'block';
     selBox.style.display = 'none';
-    if (placeAutocompleteRv && placeAutocompleteRv.value !== undefined) placeAutocompleteRv.value = '';
+    const inp = document.getElementById('reviewSearchInput');
+    if (inp) inp.value = '';
   }
 }
 
@@ -216,7 +216,8 @@ document.getElementById('changePlaceBtn').addEventListener('click', () => {
   selectedPlaceRv = null;
   document.getElementById('selectedPlaceBox').style.display = 'none';
   document.getElementById('searchFieldWrap').style.display = 'block';
-  if (placeAutocompleteRv && placeAutocompleteRv.value !== undefined) placeAutocompleteRv.value = '';
+  const inp = document.getElementById('reviewSearchInput');
+  if (inp) inp.value = '';
 });
 
 function selectPlaceRv(name, address) {
@@ -287,9 +288,7 @@ document.getElementById('reviewForm').addEventListener('submit', async e => {
 });
 
 // ── search results ────────────────────────────────────────────────────────────
-let searchedPlace      = null;
-let searchAutocompleteEl = null;
-let clearPollId        = null;
+let searchedPlace = null;
 
 function esc(str) {
   const d = document.createElement('div');
@@ -421,46 +420,32 @@ function buildResultCard(name, address, rows) {
 }
 
 // ── Google Places init ────────────────────────────────────────────────────────
-async function initAutocomplete() {
-  const { PlaceAutocompleteElement } = await google.maps.importLibrary('places');
+function initAutocomplete() {
+  const options = { fields: ['name', 'formatted_address'] };
 
   // Search view
-  searchAutocompleteEl = new PlaceAutocompleteElement();
-  searchAutocompleteEl.style.width = '100%';
-  searchAutocompleteEl.style.colorScheme = 'dark';
-  document.getElementById('searchAutoWrap').appendChild(searchAutocompleteEl);
-  document.getElementById('searchBarWrap').addEventListener('keydown', e => {
-    if (e.key === 'Enter') e.preventDefault();
-  });
-  searchAutocompleteEl.addEventListener('gmp-select', async event => {
-    const place = event.placePrediction.toPlace();
-    await place.fetchFields({ fields: ['displayName', 'formattedAddress'] });
-    searchedPlace = { name: place.displayName, address: place.formattedAddress || '' };
+  const searchInput = document.getElementById('searchInput');
+  const acSearch = new google.maps.places.Autocomplete(searchInput, options);
+  acSearch.addListener('place_changed', () => {
+    const place = acSearch.getPlace();
+    if (!place.name) return;
+    searchedPlace = { name: place.name, address: place.formatted_address || '' };
     showResults(searchedPlace.name, searchedPlace.address);
   });
-
-  function getSearchInputValue() {
-    const inner = searchAutocompleteEl.shadowRoot && searchAutocompleteEl.shadowRoot.querySelector('input');
-    return inner ? inner.value : (searchAutocompleteEl.value || '');
-  }
-  clearPollId = setInterval(() => {
-    if (searchedPlace && getSearchInputValue().trim() === '') {
+  // Clear results when input is manually cleared
+  searchInput.addEventListener('input', () => {
+    if (searchedPlace && searchInput.value.trim() === '') {
       searchedPlace = null;
       document.getElementById('resultsArea').innerHTML = '';
     }
-  }, 300);
+  });
 
   // Review view
-  placeAutocompleteRv = new PlaceAutocompleteElement();
-  placeAutocompleteRv.style.width = '100%';
-  placeAutocompleteRv.style.colorScheme = 'light';
-  document.getElementById('searchFieldWrap').appendChild(placeAutocompleteRv);
-  document.getElementById('searchFieldWrap').addEventListener('keydown', e => {
-    if (e.key === 'Enter') e.preventDefault();
-  });
-  placeAutocompleteRv.addEventListener('gmp-select', async event => {
-    const place = event.placePrediction.toPlace();
-    await place.fetchFields({ fields: ['displayName', 'formattedAddress'] });
-    selectPlaceRv(place.displayName, place.formattedAddress || '');
+  const reviewInput = document.getElementById('reviewSearchInput');
+  const acReview = new google.maps.places.Autocomplete(reviewInput, options);
+  acReview.addListener('place_changed', () => {
+    const place = acReview.getPlace();
+    if (!place.name) return;
+    selectPlaceRv(place.name, place.formatted_address || '');
   });
 }
